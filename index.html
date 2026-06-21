@@ -2166,11 +2166,23 @@
             </div>
 
             <div class="space-y-2 pt-4 border-t border-zinc-200">
-              <label class="text-sm font-bold text-zinc-700 flex items-center gap-2" for="clinicalNotes"><i
-                  data-lucide="file-text" class="h-4 w-4 text-emerald-600"></i> Clinical Notes & Background</label>
-              <textarea id="clinicalNotes" rows="4"
-                placeholder="Type background history, current struggles, NDIS goals..."
-                class="w-full p-4 text-sm rounded-xl border border-zinc-300 focus:ring-2 focus:ring-emerald-500 outline-none resize-y"></textarea>
+              <div class="flex items-center justify-between">
+                <label class="text-sm font-bold text-zinc-700 flex items-center gap-2" for="clinicalNotes"><i
+                    data-lucide="file-text" class="h-4 w-4 text-emerald-600"></i> Clinical Notes & Background</label>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="improveClinicalNotesWithAI()" id="btn-ai-improve"
+                    class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                    <i data-lucide="sparkles" class="h-3.5 w-3.5 animate-pulse"></i> AI Draft / Improve
+                  </button>
+                  <button type="button" onclick="resetGeminiKey()" title="Reset Gemini API Key"
+                    class="text-zinc-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-zinc-100 flex items-center justify-center">
+                    <i data-lucide="key-round" class="h-3.5 w-3.5"></i>
+                  </button>
+                </div>
+              </div>
+              <textarea id="clinicalNotes" rows="6"
+                placeholder="Type background history, current struggles, NDIS goals... (Or leave blank and click 'AI Draft / Improve' to auto-generate based on client details)"
+                class="w-full p-4 text-sm rounded-xl border border-zinc-300 focus:ring-2 focus:ring-emerald-500 outline-none resize-y transition-all"></textarea>
             </div>
           </div>
 
@@ -2767,6 +2779,123 @@
         const textClass = state.step === num ? "text-zinc-800" : "text-zinc-400 hidden sm:inline";
         bar.innerHTML += `<div class="flex items-center space-x-2 shrink-0"><div class="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${iconClass}">${state.step > num ? "✓" : num}</div><span class="text-sm font-semibold ${textClass}">${label}</span></div>`;
       });
+    }
+
+    async function improveClinicalNotesWithAI() {
+      const textarea = document.getElementById('clinicalNotes');
+      const btn = document.getElementById('btn-ai-improve');
+      
+      let apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) {
+        apiKey = prompt("Please enter your Gemini API Key. (You can get a free key at https://aistudio.google.com/):\n\nYour key will be securely saved only in your local browser's storage.");
+        if (!apiKey) return;
+        apiKey = apiKey.trim();
+        localStorage.setItem('gemini_api_key', apiKey);
+      }
+
+      const clientName = document.getElementById('clientName').value.trim() || 'the client';
+      const clientDob = document.getElementById('clientDob').value || 'Not provided';
+      const clientAbn = document.getElementById('clientAbnAcn').value.trim() || 'None';
+      const ndisNum = state.clientType === 'ndis' ? (document.getElementById('ndisNumber').value.trim() || 'Not provided') : null;
+      const fundingType = state.clientType === 'ndis' ? `NDIS (${state.ndisManagementType})` : 'Private Client';
+      const serviceItem = servicesDB[state.serviceFormat].find(i => i.id === state.selectedServiceId);
+      const programName = serviceItem ? serviceItem.name : 'Clinical Counselling';
+      const programFeatures = serviceItem && serviceItem.features ? serviceItem.features.join(', ') : 'Counselling / psychotherapy';
+      
+      const currentNotes = textarea.value.trim();
+
+      const originalBtnHtml = btn.innerHTML;
+      btn.innerHTML = '<i data-lucide="loader" class="h-3.5 w-3.5 loading-spinner"></i> Generating...';
+      btn.disabled = true;
+      
+      let promptText = "";
+      if (!currentNotes) {
+        promptText = `You are an expert clinical counsellor in Australia specializing in NDIS and private therapy. 
+Generate a professional, structured "Clinical Notes & Background / Plan Objectives" entry for the following client intake:
+- Client Name: ${clientName}
+- Date of Birth: ${clientDob}
+- Funding Type: ${fundingType}
+- Selected Service / Program: ${programName}
+- Focus Inclusions: ${programFeatures}
+${ndisNum ? `- NDIS Participant Number: ${ndisNum}` : ''}
+${clientAbn !== 'None' ? `- Client ABN/ACN: ${clientAbn}` : ''}
+
+Please draft:
+1. BACKGROUND & PRESENTING CONCERNS: A brief placeholder section where the counsellor can fill in specific clinical symptoms/history (e.g., anxiety, depression, executive dysfunction, distress).
+2. FUNCTIONAL IMPACTS: Typical functional difficulties in daily living (improving Improved Daily Living skills) related to this type of program.
+3. MEASURABLE THERAPEUTIC OBJECTIVES: 3 specific, clear goals aligned with the program (${programName}) and standard NDIS Improved Daily Living objectives.
+4. RECOMMENDED ASSESSMENTS: Suggested screening tools (e.g., GAD-7, PHQ-9, WHODAS 2.0) that fit this program.
+
+Format it beautifully with clear headings, bullet points, and clinical terminology. Avoid HTML tags, use standard markdown or plain text with clear spacing. Keep it concise, professional, and ready to be customized.`;
+      } else {
+        promptText = `You are an expert clinical counsellor in Australia.
+Review, polish, and enhance the following draft of clinical notes / plan objectives to make it highly professional, clinically rigorous, and structured for NDIS capacity building. 
+Preserve all original names, details, and facts, but fix any grammatical errors, improve vocabulary, organize it with clear headings, and elevate it to a professional therapeutic tone.
+
+Client Info for context:
+- Name: ${clientName}
+- Program: ${programName}
+- Funding: ${fundingType}
+
+Draft to improve:
+"""
+${currentNotes}
+"""
+
+Return only the improved version. Do not include any introductory or concluding remarks outside the notes.`;
+      }
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: promptText
+              }]
+            }]
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          if (response.status === 400 || response.status === 403) {
+            localStorage.removeItem('gemini_api_key');
+            throw new Error("Invalid API Key. The saved key has been cleared. Please click the button again to enter a valid Gemini API Key.");
+          }
+          throw new Error(errorData.error?.message || `HTTP error ${response.status}`);
+        }
+
+        const data = await response.json();
+        const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!generatedText) {
+          throw new Error("Received empty response from the AI model.");
+        }
+
+        textarea.value = generatedText.trim();
+      } catch (err) {
+        alert("AI Assistant Error: " + err.message);
+      } finally {
+        btn.innerHTML = originalBtnHtml;
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    function resetGeminiKey() {
+      const current = localStorage.getItem('gemini_api_key');
+      const newKey = prompt("Manage Gemini API Key\n\nTo update your key, enter the new one below.\nTo delete the saved key, leave it blank and press OK:\n\nCurrent key: " + (current ? "••••••••" + current.slice(-4) : "None"), current || "");
+      if (newKey === null) return; // cancelled
+      if (newKey.trim() === "") {
+        localStorage.removeItem('gemini_api_key');
+        alert("Saved Gemini API Key has been deleted.");
+      } else {
+        localStorage.setItem('gemini_api_key', newKey.trim());
+        alert("Gemini API Key updated successfully.");
+      }
     }
   </script>
 
