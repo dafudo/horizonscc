@@ -2058,6 +2058,11 @@
                 <input type="text" id="ndisNumber" placeholder="9 digits"
                   class="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none bg-emerald-50/30 font-mono text-lg tracking-widest transition-colors">
               </div>
+              <div class="space-y-1.5 sm:col-span-2 pt-2">
+                <label class="text-sm font-bold text-zinc-700" for="clientAbnAcn">ABN / ACN (Optional)</label>
+                <input type="text" id="clientAbnAcn" placeholder="11-digit ABN or 9-digit ACN"
+                  class="w-full p-3 rounded-xl border border-zinc-300 focus:ring-2 focus:ring-emerald-500 outline-none transition-colors">
+              </div>
             </div>
           </div>
 
@@ -2180,6 +2185,8 @@
                     class="text-zinc-900" id="review-funding">-</strong></div>
                 <div><span class="text-zinc-500 block text-[10px] font-bold uppercase mb-1">Client Name</span><strong
                     class="text-zinc-900" id="review-client-name">-</strong></div>
+                <div id="review-abn-container" class="hidden"><span class="text-zinc-500 block text-[10px] font-bold uppercase mb-1">ABN / ACN</span><strong
+                    class="text-zinc-900" id="review-abn">-</strong></div>
                 <div class="col-span-2 mt-2"><span
                     class="text-emerald-700 block text-[10px] font-bold uppercase mb-1">Program Selected</span><strong
                     class="text-emerald-900 bg-emerald-100/50 px-2 py-1 rounded inline-block"
@@ -2597,12 +2604,14 @@
         const cPhone = document.getElementById('clientPhone').value.trim().replace(/\s/g, '');
         const cAdd = document.getElementById('clientAddress').value.trim();
         const nNum = document.getElementById('ndisNumber').value.trim().replace(/\s/g, '');
+        const cAbnAcn = document.getElementById('clientAbnAcn').value.trim().replace(/\s/g, '');
 
         if (!cName) { isValid = false; markError('clientName'); }
         if (!cEmail || !emailRegex.test(cEmail)) { isValid = false; markError('clientEmail'); }
         if (!cPhone || !phoneRegex.test(cPhone)) { isValid = false; markError('clientPhone'); }
         if (!cAdd) { isValid = false; markError('clientAddress'); }
         if (state.clientType === 'ndis' && (!nNum || !/^\d{9}$/.test(nNum))) { isValid = false; markError('ndisNumber'); errorMsg = "NDIS number must be exactly 9 digits."; }
+        if (cAbnAcn && !/^\d{9}$|^\d{11}$/.test(cAbnAcn)) { isValid = false; markError('clientAbnAcn'); errorMsg = "ABN must be exactly 11 digits, or ACN must be exactly 9 digits."; }
         if (!isValid && !errorMsg) errorMsg = "Please ensure all client details (valid email and Australian phone) are correct.";
       }
 
@@ -2728,6 +2737,13 @@
       if (state.step === 5) {
         document.getElementById('review-funding').innerText = state.clientType === 'ndis' ? `NDIS (${state.ndisManagementType})` : 'Private Client';
         document.getElementById('review-client-name').innerText = document.getElementById('clientName').value || '-';
+        const clientAbnVal = document.getElementById('clientAbnAcn').value.trim();
+        if (clientAbnVal) {
+          document.getElementById('review-abn').innerText = clientAbnVal;
+          document.getElementById('review-abn-container').classList.remove('hidden');
+        } else {
+          document.getElementById('review-abn-container').classList.add('hidden');
+        }
         document.getElementById('review-service').innerText = servicesDB[state.serviceFormat].find(i => i.id === state.selectedServiceId)?.name || '-';
         checkConsents();
       }
@@ -2791,7 +2807,7 @@
       const payload = {
         submittedAt: new Date().toISOString(), status: "New", clientType: state.clientType, ndisManagementType: state.clientType === 'ndis' ? state.ndisManagementType : null,
         planManager: state.clientType === 'ndis' && state.ndisManagementType === 'Plan Managed' ? { companyName: document.getElementById('pmName').value, contactPerson: document.getElementById('pmContact').value, email: document.getElementById('pmEmail').value, phone: document.getElementById('pmPhone').value, abn: document.getElementById('pmAbn').value, address: document.getElementById('pmAddress').value } : null,
-        client: { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, address: document.getElementById('clientAddress').value, dob: document.getElementById('clientDob').value, ndisNumber: state.clientType === 'ndis' ? document.getElementById('ndisNumber').value : null },
+        client: { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, address: document.getElementById('clientAddress').value, dob: document.getElementById('clientDob').value, ndisNumber: state.clientType === 'ndis' ? document.getElementById('ndisNumber').value : null, abnAcn: document.getElementById('clientAbnAcn').value.trim() || null },
         programRequest: { format: state.serviceFormat, serviceId: state.selectedServiceId, serviceName: serviceItem.name },
         clinicalNotes: finalNotes, consentDeclared: true
       };
