@@ -433,15 +433,22 @@
           </div>
         </div>
 
-        <!-- Direct Email Template Link -->
-        <div class="mt-10 text-center">
+        <!-- Direct Email Template Link & SC Flyer Download -->
+        <div class="mt-12 text-center flex flex-col items-center justify-center gap-6">
           <p class="text-sm text-zinc-650">
             Prefer email over online portals?
-            <a href="mailto:office@horizonscc.com.au?subject=New%20Referral%20Request%20-%20Support%20Coordinator&body=Hi%20Horizon%20Counselling%20Team%2C%0A%0AI%20would%20like%20to%20submit%20a%20new%20referral%20for%20a%20participant.%0A%0A---%20REFERRAL%20DETAILS%20---%0AParticipant%20Name%3A%20%0AParticipant%20Contact%20Number%3A%20%0AParticipant%20Email%3A%20%0ANDIS%20Management%20Type%20(Self-Managed%2FPlan%20Managed)%3A%20%0ASupport%20Coordinator%20Name%3A%20%0ASupport%20Coordinator%20Email%2FPhone%3A%20%0APrimary%20Goals%2FReason%20for%20Referral%3A%20%0A%0AThank%20you%2C%0A%5BYour%20Name%5D"
+            <a href="mailto:office@horizonscc.com.au?subject=New%20Referral%20Request%20-%20Support%20Coordinator&body=Hi%20Horizon%20Counselling%20Team%2C%0A%0AI%20would%20like%20to%20submit%20a%20new%20referral%20for%20a%20participant.%0A%0A---%20REFERRAL%20DETAILS%20---%0AParticipant%20Name%3A%20%0AParticipant%20Contact%20Number%3A%20%0AParticipant%20Email%3A%20%0ANDIS%20Management%20Type%20(Self-Managed%2FPlan%20Managed)%3A%20%0ASupport%20Coordinator%20Name%3A%20%0ASupport%20Coordinator%20Email%2FPhone%3A%20%0APrimary%20Goals%2FReason%20for%20Referral%3A%20%0A%0AThank%2520you%252C%250A%255BYour%2520Name%255D"
               class="text-emerald-700 hover:text-emerald-800 font-bold inline-flex items-center gap-1.5 ml-1 transition hover:underline">
               <i data-lucide="mail" class="h-4 w-4"></i> Click here to use our pre-filled Referral Email Template
             </a>
           </p>
+          <div class="flex flex-wrap items-center justify-center gap-4">
+            <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Resources for SCs:</span>
+            <a href="horizons-sc-flyer.pdf" download
+              class="inline-flex items-center gap-2 py-2 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+              <i data-lucide="download" class="h-3.5 w-3.5"></i> Download Support Coordinator Flyer (PDF)
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -696,11 +703,11 @@
               <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl w-fit mb-4">
                 <i data-lucide="file-text" class="h-6 w-6"></i>
               </div>
-              <h4 class="font-bold text-zinc-800 text-lg mb-2">Psychosocial Assessment Report - Case A</h4>
+              <h4 class="font-bold text-zinc-800 text-lg mb-2">Psychosocial Assessment Report</h4>
               <p class="text-sm text-zinc-500 leading-relaxed">Comprehensive NDIS assessment utilizing GAD-7, PHQ-9, and
                 WHODAS 2.0 to demonstrate functional impact.</p>
             </div>
-            <button onclick="downloadWithWatermark('example-ndis-1.pdf', 'Sample_Psychosocial_Assessment_Case_A.pdf')"
+            <button onclick="downloadWithWatermark('psychosocial-assessment-report.pdf', 'Sample_Psychosocial_Assessment_Report.pdf')"
               class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2">
               <i data-lucide="download" class="h-4 w-4"></i> Download Sample PDF
             </button>
@@ -713,11 +720,11 @@
               <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl w-fit mb-4">
                 <i data-lucide="file-text" class="h-6 w-6"></i>
               </div>
-              <h4 class="font-bold text-zinc-800 text-lg mb-2">Psychosocial Assessment Report - Case B</h4>
-              <p class="text-sm text-zinc-500 leading-relaxed">Psychosocial assessment detailing support
-                recommendations and goal alignment for plan reviews.</p>
+              <h4 class="font-bold text-zinc-800 text-lg mb-2">Comprehensive Progress Report</h4>
+              <p class="text-sm text-zinc-500 leading-relaxed">Detailed clinical progress update comparing screening scores
+                over time to demonstrate ongoing support needs for NDIS Plan Reviews.</p>
             </div>
-            <button onclick="downloadWithWatermark('example-ndis-2.pdf', 'Sample_Psychosocial_Assessment_Case_B.pdf')"
+            <button onclick="downloadWithWatermark('comprehensive-progress-report.pdf', 'Sample_Comprehensive_Progress_Report.pdf')"
               class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2">
               <i data-lucide="download" class="h-4 w-4"></i> Download Sample PDF
             </button>
@@ -730,11 +737,11 @@
               <div class="p-3 bg-purple-100 text-purple-700 rounded-xl w-fit mb-4">
                 <i data-lucide="file-check" class="h-6 w-6"></i>
               </div>
-              <h4 class="font-bold text-zinc-800 text-lg mb-2">Post-Program Therapy Summary</h4>
-              <p class="text-sm text-zinc-500 leading-relaxed">Detailed clinical progress summary compiled after
-                completing a structured therapeutic program package.</p>
+              <h4 class="font-bold text-zinc-800 text-lg mb-2">Therapeutic Program Completion Report</h4>
+              <p class="text-sm text-zinc-500 leading-relaxed">Detailed clinical summary compiled after completing a
+                structured therapeutic program package, highlighting outcomes and transition care recommendations.</p>
             </div>
-            <button onclick="downloadWithWatermark('example-clinical-note-1.pdf', 'Sample_Therapy_Summary_Report.pdf')"
+            <button onclick="downloadWithWatermark('therapeutic-program-completion-report.pdf', 'Sample_Program_Completion_Report.pdf')"
               class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2">
               <i data-lucide="download" class="h-4 w-4"></i> Download Sample PDF
             </button>
@@ -751,7 +758,7 @@
               <p class="text-sm text-zinc-500 leading-relaxed">Example of our NDIS/private practice invoice layout. We
                 support automatic, fast online payments via Stripe for easy, secure, and instant bank transfers.</p>
             </div>
-            <button onclick="downloadWithWatermark('example-invoice-2.pdf', 'Sample_Invoice.pdf')"
+            <button onclick="downloadWithWatermark('tax-invoice.pdf', 'Sample_Invoice.pdf')"
               class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2">
               <i data-lucide="download" class="h-4 w-4"></i> Download Sample PDF
             </button>
